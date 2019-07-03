@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ityi.dao.system.SysLogDao">
+
+    <resultMap id="BaseResultMap" type="com.ityi.domain.system.SysLog">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="ip" property="ip" />
+        <result column="time" property="time" />
+        <result column="method" property="method" />
+        <result column="action" property="action" />
+        <result column="company_id" property="companyId" />
+        <result column="company_name" property="companyName" />
+    </resultMap>
+
+    <!--查询全部-->
+    <select id="findAll" parameterType="string" resultMap="BaseResultMap">
+        select * from st_sys_log where company_id=#{companyId}
+    </select>
+
+    <!--添加-->
+    <insert id="save" parameterType="com.ityi.domain.system.SysLog">
+        insert into st_sys_log (id, user_name, ip, time, method, action,company_id,company_name
+          )
+        values (#{id}, #{userName}, #{ip}, #{time}, #{method},#{action},#{companyId},#{companyName}
+          )
+    </insert>
+
+    <!--系统访问压力图-->
+    <select id="findOnlineData" resultType="map">
+        SELECT
+        a.a1 时间,IFNULL(b.c,0) 次数
+        FROM `st_online_info` a LEFT JOIN
+        (SELECT DATE_FORMAT(TIME,'%H') t ,COUNT(1) c FROM `st_sys_log` GROUP BY t) b
+        ON
+          a.a1=b.t
+    </select>
+
+    <!--厂家销售情况-->
+    <select id="findFactory" resultType="map">
+        SELECT
+         `factory_name` 工厂名称 ,SUM(amount) 销售额
+        FROM `co_contract_product`
+        GROUP BY factory_name
+    </select>
+
+    <!--产品销售排行-->
+    <select id="findfactorysale" resultType="map">
+        SELECT
+        product_no,SUM(amount) allAmount
+        FROM co_contract_product
+        GROUP BY product_no
+        ORDER BY allAmount DESC
+        LIMIT 15
+    </select>
+</mapper>

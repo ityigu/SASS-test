@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--配置springmvc创建容器时要扫描包-->
+    <context:component-scan base-package="com.ityi.web"></context:component-scan>
+
+    <!--配置视图解析器-->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <!--自定义类型转换器是采用注册服务的方式配置的-->
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <!--注入我们自己的自定义类型转换器-->
+        <property name="converters">
+            <set>
+                <bean class="com.ityi.web.converters.StringToDateConverter">
+                    <property name="pattern" value="yyyy-MM-dd"></property>
+                </bean>
+            </set>
+        </property>
+    </bean>
+    <mvc:default-servlet-handler/>
+
+    <!--配置springmvc开启注解的支持-->
+    <mvc:annotation-driven conversion-service="conversionService"/>
+
+    <!--开启Springmvc对注解aop的支持-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!--dubbo服务消费者的配置-->
+
+    <!--配置消费者服务名称，注意不要和提供者重名-->
+    <dubbo:application name="export_manager_web"></dubbo:application>
+
+    <!--配置zookeeper注册中心的地址-->
+    <dubbo:registry address="zookeeper://localhost:2181"></dubbo:registry>
+
+    <!--配置dubbo扫描的包-->
+    <dubbo:annotation package="com.ityi.web"></dubbo:annotation>
+
+    <!--配置合理化检查
+        true：开启合理化检查
+        false：不开启合理化检查
+        合理化检查，要求现有服务提供者，然后再有服务消费者。当开启合理化检查后，没有提供者，消费者启动不起来。
+    -->
+    <dubbo:consumer check="false"></dubbo:consumer>
+
+    <!--配置springMvc的文件解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--设置文件上传大小-->
+        <property name="maxUploadSize" value="10485760"></property>
+    </bean>
+
+    <!--<bean id="fileUploadUtils" class="org.apache.commons.io.filefilter.FileFilterUtils"></bean>-->
+
+    <!--指定property文件的位置
+    <context:property-placeholder location="classpath:properties/qiniu.properties"></context:property-placeholder>-->
+
+    <!--解析占位符的配置类，由spring提供的。它在4.3版本以后内置到容器里了，在4.3版本以前需要我们自己配置
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:properties/qiniu.properties"></property>
+    </bean>-->
+
+</beans>

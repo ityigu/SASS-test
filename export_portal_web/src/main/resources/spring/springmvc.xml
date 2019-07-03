@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--配置springmvc创建容器时要扫描的包-->
+    <context:component-scan base-package="com.ityi.web"></context:component-scan>
+
+    <!--配置springmvc的注解支持-->
+    <mvc:annotation-driven/>
+
+    <!--dubbo的配置-->
+
+    <!--配置注册到注册中心的应用名称-->
+    <dubbo:application name="export_portal_web"></dubbo:application>
+
+    <!--配置注册中心地址-->
+    <dubbo:registry address="zookeeper://localhost:2181"></dubbo:registry>
+
+    <!--配置dubbo注解扫描-->
+    <dubbo:annotation package="com.ityi.web"></dubbo:annotation>
+
+    <!--配置合理化检查-->
+    <dubbo:consumer check="false"></dubbo:consumer>
+
+</beans>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--配置Spring创建ioc容器时要扫描的包-->
+    <context:component-scan base-package="com.ityi">
+        <!--排除controller-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:exclude-filter>
+    </context:component-scan>
+
+    <!--指定读取的propert文件位置-->
+    <context:property-placeholder location="classpath:properties/db.properties"></context:property-placeholder>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!--配置mybatis的SqlSessionFactory-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="typeAliasesPackage" value="com.ityi.domain"></property>
+        <!-- 配置mybatis的分页插件：PageHelper -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!-- 配置插件所需的属性 -->
+                        <value>
+                            helperDialect=mysql
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!--配置映射扫描器-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ityi.dao"></property>
+    </bean>
+</beans>

@@ -123,6 +123,7 @@ public class ContractProductServiceImpl implements ContractProductService{
     public void saveAll(List<ContractProduct> cps) {
         for (ContractProduct cp :cps){
             save(cp);
+			System.out.print("5555");
         }
     }
 }
